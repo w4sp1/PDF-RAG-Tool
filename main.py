@@ -46,6 +46,4 @@ class UI:
 
                         st.session_state.messages.append({"role" : "ai", "content" : response})
                         
-
-
 UI()
