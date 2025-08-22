@@ -1,15 +1,23 @@
-from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_ollama.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from LLM.llm import LLM
+from langchain_core.documents import Document
+import fitz
+
 
 class Reader:
     def __init__(self, pdfPath, prompt):
         self.prompt = prompt
 
-        self.document = PyMuPDFLoader(pdfPath).load()
-        print(len(self.document))
+        document = fitz.open(stream=pdfPath, filetype="pdf")
+        self.document = []
+        for i in range(len(document)):
+            page_data = document[i]
+            text = page_data.get_text()
+            self.document.append(Document(page_content=text, metadata={"page": i+ 1}))
+
+
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         self.llm = LLM()
 
@@ -22,6 +30,3 @@ class Reader:
 
         for i in self.llm.generate_response(prompt):
             yield i
-
-
-
