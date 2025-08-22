@@ -26,7 +26,7 @@ class Reader:
         self.vector_store = FAISS.from_documents(split_documents, OllamaEmbeddings(model="nomic-embed-text"))
         context = self.vector_store.similarity_search(self.prompt, k=4)
         content = " ".join([i.page_content for i in context])
-        prompt = "You are a helpful assistant who can read PDF documents and give proper answers to questions on the PDF. You are to ensure your answers are crisp yet detailed enough. If you do not know answers to any questions, respond with 'I don't know'\n. Based on the context given below: \n"+content+"\nAnswer:"+self.prompt
+        prompt = "You are a helpful assistant who can read PDF documents and give proper answers to questions on the PDF. You are to ensure your answers are crisp yet detailed enough. If you do not know answers to any questions, respond with 'I don't know'\n. If you encounter math notation, embed them in LaTeX and surround them with $ signs. For example, use $<LaTeX code here>$ and not anything else. Based on the context given below: \n"+content+"\nAnswer:"+self.prompt
 
         for i in self.llm.generate_response(prompt):
             yield i
